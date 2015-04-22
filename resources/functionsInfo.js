@@ -1,6 +1,6 @@
 var functionsInfo = {
     "functions": [{
-        "name": "Coffee Machine",
+        "name": "make Coffee",
         "url": "http://localhost:3000/action/cook",
         "available": true,
         "parameters": [

@@ -6,7 +6,6 @@ var request = require('request');
 var db = require('./db.js');
 var thingFunctions = require('./functionsInfo');
 
-
 /**
  * Sends a status message to the swot server
  * @param thingMessage The message to send

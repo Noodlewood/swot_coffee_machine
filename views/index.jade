@@ -95,31 +95,44 @@ html
         <span id="progressBar""><span></span></span>
         </div>
 
+        <div class="drink">Ready to cook Coffee!</div>
+
         script(type='text/javascript').
             $(function() {
                 (function () {
                     var socket = io.connect('http://localhost');
                     var animContainer = $('.animation-container');
                     var progressBar = $('#progressBar');
+                    var drinkLabel = $('.drink');
                     var progress = 0;
+                    var interval;
+                    var currentDrink = "";
                     animContainer.hide();
+                    progressBar.parent().hide();
+                    progressBar.width(progress + "%");
 
-                    var interval = setInterval(function(time) {
-                        progress += 10;
-                        if (progress > 100) progress = 100;
-                        progressBar.width(progress + "%");
-                        socket.emit('progress', progress);
-                    }, 1000);
+                    socket.on('cook', function (drink) {
+                        currentDrink = drink;
+                        drinkLabel.text("Cooking: " + drink);
+                        animContainer.fadeIn();
+                        progressBar.parent().fadeIn();
+                        interval = setInterval(function (time) {
+                            progress += 10;
+                            if (progress > 100) progress = 100;
+                            progressBar.width(progress + "%");
+                            socket.emit('progress', progress);
+                        }, 1000);
+                    });
+
                     $('.coffee').on('webkitAnimationEnd oanimationend animationend',
                         function() {
+                            drinkLabel.text("Ready to cook Coffee!");
                             progress = 0;
                             progressBar.width(progress + "%");
                             clearInterval(interval);
                             animContainer.fadeOut();
-                            socket.emit('cooking_finished');
-                    });
-                    socket.on('cook', function (drink) {
-                        animContainer.fadeIn();
+                            progressBar.parent().fadeOut();
+                            socket.emit('cooking_finished', currentDrink);
                     });
                 }());
 
