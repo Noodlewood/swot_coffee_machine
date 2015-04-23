@@ -2,9 +2,10 @@ var fs = require('fs');
 var express = require('express');
 var router = express.Router();
 var request = require('request');
+var db = require('./db');
 
-var db = require('./db.js');
-var thingFunctions = require('./functionsInfo');
+var swotRestRoutes = require('./swotRestRoutes');
+
 
 /**
  * Sends a status message to the swot server
@@ -14,7 +15,7 @@ var sendMessageToServer = function(thingMessage){
 
     db.getNetworkData(function(accessToken, err) {
         request.post(
-            'http://localhost:8080/swot/web/app_dev.php/api/v1/thing/messages',
+            swotRestRoutes.routes.post_messages,
             {
                 form:
                 { message: thingMessage },
@@ -37,13 +38,13 @@ var sendMessageToServer = function(thingMessage){
 };
 
 /**
- * Sends functions update notification with the data to the server.
+ * Sends funtions update notification with the data to the server.
  */
 var sendUpdateNotification = function(){
 
     db.getNetworkData(function(accessToken, err) {
         request.post(
-            'http://localhost:8080/swot/web/app_dev.php/api/v1/thing/functions/update',
+            swotRestRoutes.routes.post_functions_update,
             {
                 form: {message: "The thing functions has been updated."},
                 headers: {
@@ -71,7 +72,7 @@ var sendInfoUpdateNotification = function(){
 
     db.getNetworkData(function(accessToken, err) {
         request.post(
-            'http://localhost:8080/swot/web/app_dev.php/api/v1/thing/information/update',
+            swotRestRoutes.routes.post_info_update,
             {
                 form: {message: "Thing information has been updated."},
                 headers: {
@@ -92,6 +93,35 @@ var sendInfoUpdateNotification = function(){
     });
 };
 
+/**
+ * Sends profile image update notification with the data to the server.
+ */
+var sendImageUpdateNotification = function(){
+
+    db.getNetworkData(function(accessToken, err) {
+        request.post(
+            swotRestRoutes.routes.post_image_update,
+            {
+                form: {profileimage: "http://localhost:3000/downloads/prototype_profile.jpg"},
+                headers: {
+                    "content-type": "application/x-www-form-urlencoded",
+                    "accesstoken": accessToken
+                }
+            },
+            function (error, response, body) {
+                if (!error && response.statusCode == 200) {
+                    console.log("image update was send successful");
+                    console.log(body);
+                } else {
+                    console.log("image update couldn't be send");
+                    console.log(error);
+                }
+            }
+        );
+    });
+};
+
 module.exports.sendMessageToServer = sendMessageToServer;
 module.exports.sendUpdateNotification = sendUpdateNotification;
 module.exports.sendInfoUpdateNotification = sendInfoUpdateNotification;
+module.exports.sendImageUpdateNotification = sendImageUpdateNotification;

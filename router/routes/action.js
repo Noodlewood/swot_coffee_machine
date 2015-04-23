@@ -1,5 +1,6 @@
 require('../../resources/socketio.js');
 
+var serverCom = require('../../resources/serverCommunication.js');
 var express = require('express');
 var router = express.Router();
 var db = require('../../resources/db.js');
@@ -22,10 +23,14 @@ router.get('/cook', function(req, res) {
                 if (readyStatus == "true") {
                     startCooking(req, res);
                 } else {
-                    var err = new Error();
-                    err.status = 403;
-                    err.message = "Coffee Machine is not ready.";
-                    res.status(403).json(err);
+                    var actionResponse = {
+                        "statusCode": 200,
+                        "status": "success"
+                    };
+                    actionResponse.message = "Coffee Machine is not ready.";
+
+                    res.json(actionResponse);
+                    serverCom.sendMessageToServer("Coffee Machine is already in use.");
                 }
             });
         }
@@ -37,15 +42,10 @@ var startCooking = function(req, res) {
     var paramNumber = parseInt(req.query[paramName]);
     var choice = choices[paramNumber];
     if (choice) {
-        db.setStatus("ready", "false", function() {
+        db.setStatus("ready", "false", "boolean", function() {
             var actionResponse = {
                 "statusCode": 200,
-                "status": "success",
-                "request": {
-                    "requestedUrl": "http://localhost:3000/action/cook",
-                    "functionName": "cook",
-                    "params": func.functions[0].parameters[0]
-                }
+                "status": "success"
             };
             actionResponse.message = choice + " is ready soon!";
 

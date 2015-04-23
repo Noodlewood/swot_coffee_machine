@@ -2,14 +2,11 @@ var tokens = require('./tokens.js');
 
 var registerInfo = {
     "device": {
-        "id": "Coffee Machine",
-        "classification": "Cooking",
-        "url": "http://localhost:3000",
+        "name": "Coffee Machine",
+        "description": "You can make Coffee with this! Classic, Cappuccino, Espresso, Macchiato... and you can even double them! Awesome? AWESOME!",
+        "profileimage": "http://localhost:3000/downloads/prototype_profile.jpg",
         "api": {
-            "deregister": "http://localhost:3000/deregister",
-            "function": "http://localhost:3000/functions",
-            "status": "http://localhost:3000/status",
-            "profileimage": "http://localhost:3000/downloads/prototype_profile.jpg"
+            "url": "http://localhost:3000"
         }
     }};
 

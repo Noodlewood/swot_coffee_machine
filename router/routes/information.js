@@ -19,8 +19,8 @@ router.get('/', function(req, res) {
             err.message = 'You are not permitted to perform this.';
             res.status(403).json(err);
         }
-    });
 
+    });
 });
 
 module.exports = router;

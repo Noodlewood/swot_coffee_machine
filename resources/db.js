@@ -11,7 +11,6 @@ var sqlite3 = require("sqlite3").verbose();
  */
 var initializeDB = function () {
     var exists = fs.existsSync(dataFile);
-
     if(!exists){
         console.log("DB not found ... creating new one");
         fs.openSync(dataFile, "w");
@@ -21,23 +20,26 @@ var initializeDB = function () {
 
     db.serialize(function() {
         if (!exists) {
-            db.run("CREATE TABLE access_token (token varchar(255), used tinyint)");
-            var stmt = db.prepare("INSERT INTO access_token VALUES ('r3g1st3rT0k3n', 0)");
+            db.run('CREATE TABLE access_token (token varchar(255), used tinyint)');
+            var stmt = db.prepare('INSERT INTO access_token VALUES ("r3g1st3rT0k3n", 0)');
             stmt.run();
             stmt.finalize();
 
-            db.run("CREATE TABLE status (root varchar(255), root_status varchar(255))");
-            stmt = db.prepare("INSERT INTO status VALUES ('ready', 'true')");
+            db.run('CREATE TABLE information (title varchar(255), value varchar(255), type varchar(255))');
+            stmt = db.prepare('INSERT INTO information VALUES ("ready", "true", "boolean")');
             stmt.run();
             stmt.finalize();
 
-            stmt = db.prepare("INSERT INTO status VALUES ('progress', '0')");
+            stmt = db.prepare('INSERT INTO information VALUES ("progress", "0", "percentage")');
             stmt.run();
             stmt.finalize();
 
-            db.run("CREATE TABLE network_data (network_token varchar(255))");
+            db.run('CREATE TABLE network_data (network_token varchar(255))');
+
+            console.log('New DB created');
         }
     });
+
     db.close();
 };
 
@@ -49,7 +51,7 @@ var setAccessTokenToUsed = function(){
     // @TODO alternative to open DB?!
     var db = new sqlite3.Database(dataFile);
     // @TODO keep id as indicator what to set?
-    db.run("UPDATE access_token SET used = 1 WHERE ROWID = ?", 1);
+    db.run('UPDATE access_token SET used = 1 WHERE ROWID = ?', 1);
     db.close();
 };
 
@@ -59,7 +61,7 @@ var setAccessTokenToUsed = function(){
  */
 var setAccessTokenFree = function(){
     var db = new sqlite3.Database(dataFile);
-    db.run("UPDATE access_token SET used = 0 WHERE ROWID = ?", 1);
+    db.run('UPDATE access_token SET used = 0 WHERE ROWID = ?', 1);
     db.close();
 };
 
@@ -68,7 +70,7 @@ var setAccessTokenFree = function(){
  */
 var getAccessToken = function(callback){
     var db = new sqlite3.Database(dataFile);
-    db.get("SELECT token, used FROM access_token WHERE ROWID = ?", 1, function(err, row) {
+    db.get('SELECT token, used FROM access_token WHERE ROWID = ?', 1, function(err, row) {
         callback(row.token, row.used, err);
     } );
 
@@ -78,12 +80,10 @@ var getAccessToken = function(callback){
 /**
  * Sets the network data of the device
  * @param network_token
- * @param network_id
  */
 var setNetworkData = function(network_token){
-    console.log(network_token);
     var db = new sqlite3.Database(dataFile);
-    var stmt = db.prepare("INSERT INTO network_data VALUES (?)", network_token);
+    var stmt = db.prepare('INSERT INTO network_data VALUES (?)', network_token);
     stmt.run();
     stmt.finalize();
 
@@ -96,7 +96,7 @@ var setNetworkData = function(network_token){
  */
 var getNetworkData = function(callback){
     var db = new sqlite3.Database(dataFile);
-    db.get("SELECT network_token FROM network_data WHERE ROWID = ?", 1 , function(err, row) {
+    db.get('SELECT network_token FROM network_data WHERE ROWID = ?', 1 , function(err, row) {
         callback(row.network_token, err);
     });
     db.close();
@@ -108,7 +108,7 @@ var getNetworkData = function(callback){
  */
 var deleteNetworkData = function(network_token){
     var db = new sqlite3.Database(dataFile);
-    db.run("DELETE FROM network_data WHERE network_token = ?", network_token);
+    db.run('DELETE FROM network_data WHERE network_token = ?', network_token);
     db.close();
 };
 
@@ -118,17 +118,31 @@ var deleteNetworkData = function(network_token){
  */
 var getStatusInfo = function(callback){
     var db = new sqlite3.Database(dataFile);
-    db.all("SELECT root, root_status FROM status", function(err, rows) {
-        var info = "[";
+    db.all('SELECT title, value, type FROM information', function(err, rows) {
+
+        var info = { "information" : []};
+
         rows.forEach(function (row) {
-            var root = "'title' : '" + row.root + "'";
-            var root_status = "'value' : '" + row.root_status + "'";
-            info += "{" + root + "," + root_status + "}";
+            info.information.push({
+                "title": row.title,
+                "value": row.value,
+                "type": row.type
+            });
         });
-        info += "]";
-        var statusObject = eval('(' + info + ')');
-        callback(statusObject);
+        callback(info);
     } );
+    db.close();
+};
+
+/**
+ * Sets the status of a sensor.
+ * @param title
+ * @param value
+ * @param type
+ */
+var setStatus = function(title, value, type, callback){
+    var db = new sqlite3.Database(dataFile);
+    db.run('UPDATE information SET value = ?, type = ? WHERE title = ?', [value, type, title], callback);
     db.close();
 };
 
@@ -139,22 +153,9 @@ var getStatusInfo = function(callback){
  */
 var getStatus = function(sensor, callback){
     var db = new sqlite3.Database(dataFile);
-    db.get("SELECT root_status FROM status WHERE root = ?", sensor, function(err, row) {
-        callback(row.root_status);
+    db.get('SELECT value, type FROM information WHERE title = ?', sensor, function(err, row) {
+        callback(row.value);
     } );
-    db.close();
-};
-
-/**
- * Sets the status of a sensor.
- * @param root
- * @param root_status
- */
-var setStatus = function(root, root_status, callback){
-    var db = new sqlite3.Database(dataFile);
-    db.run("UPDATE status SET root_status = ? WHERE root = ?", root_status, root, function() {
-        callback();
-    });
     db.close();
 };
 
