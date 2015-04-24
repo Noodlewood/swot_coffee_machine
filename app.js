@@ -14,7 +14,7 @@ app.use(express.static('public'));
 // otherwise an error is thrown
 app.set('view engine', 'jade');
 
-baseUrl = "http://localhost:3000";
+baseUrl = "http://localhost:3002";
 
 var server = require('http').Server(express);
 io = require('socket.io')(server);
