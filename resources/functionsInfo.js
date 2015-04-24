@@ -1,7 +1,7 @@
 var functionsInfo = {
     "functions": [{
         "name": "make Coffee",
-        "url": "http://localhost:3000/action/cook",
+        "url": baseUrl + "/action/cook",
         "available": true,
         "parameters": [
             {

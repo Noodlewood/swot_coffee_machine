@@ -102,7 +102,7 @@ var sendImageUpdateNotification = function(){
         request.post(
             swotRestRoutes.routes.post_image_update,
             {
-                form: {profileimage: "http://localhost:3000/downloads/prototype_profile.jpg"},
+                form: {profileimage: baseUrl + "/downloads/prototype_profile.jpg"},
                 headers: {
                     "content-type": "application/x-www-form-urlencoded",
                     "accesstoken": accessToken
