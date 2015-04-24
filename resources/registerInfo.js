@@ -6,7 +6,7 @@ var registerInfo = {
         "description": "You can make Coffee with this! Classic, Cappuccino, Espresso, Macchiato... and you can even double them! Awesome? AWESOME!",
         "profileimage": baseUrl + "/downloads/prototype_profile.jpg",
         "api": {
-            "url": "http://localhost:3000"
+            "url": baseUrl
         }
     }};
 
