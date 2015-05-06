@@ -1,4 +1,5 @@
 # SWOT Thing prototype
+## SWOTY Coffee Machine
 
 ### Installation:
 npm must be installed
