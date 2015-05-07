@@ -1,3 +1,12 @@
+# IDEA
+/.idea/
+
+# node_modules
+/node_modules/
+
+#db
+/resources/deviceData.db
+
 # Windows image file caches
 Thumbs.db
 ehthumbs.db
