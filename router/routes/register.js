@@ -11,18 +11,30 @@ var registerInfo = require('../../resources/registerInfo.js');
 router.get('/', function(req, res) {
 
     db.getAccessToken(function(token, used, err) {
-        if(used != 1 && req.query.access_token == token && req.headers['networktoken'] != ""){
+        if (req.headers['networktoken'] == "") {
+            //no networktoken was given
+            var err = new Error();
+            err.status = 500;
+            err.message = 'error: no network token given';
+            res.status(500).json(err);
+        } else if (req.query.access_token != token) {
+            //accesstoken is wrong
+            var err = new Error();
+            err.status = 401;
+            err.message = 'error: register token is invalid';
+            res.status(401).json(err);
+        } else if (used == 1) {
+            //thing is already registered
+            var err = new Error();
+            err.status = 423;
+            err.message = 'error: device is already registered';
+            res.status(423).json(err);
+        } else {
+            //registration successful
             db.setAccessTokenToUsed();
             db.setNetworkData(req.headers['networktoken']);
             res.json(registerInfo);
-        }else{
-            // a wrong parameter was sent
-            var err = new Error();
-            err.status = 500;
-            err.message = 'Something went wrong';
-            res.status(500).json(err);
         }
-
     });
 });
 
