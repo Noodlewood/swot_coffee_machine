@@ -14,6 +14,7 @@ app.use(express.static('public'));
 // otherwise an error is thrown
 app.set('view engine', 'jade');
 
+// For usage with XAMPP use localhost, e.g. :
 //baseUrl = "http://localhost:3002";
 baseUrl = "http://13.13.13.16:3002";
 
